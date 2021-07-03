@@ -17,4 +17,6 @@ Ejecutar la aplicación como un servidor
 - mvnw.cmd spring-boot:run
 
 ## Rutas
-- localhost:8080/api/percent
+Agregar en {num} el numero de clusters
+- localhost:8080/api/simplekmean/{num}
+- localhost:8080/api/hierarchical/{num}
