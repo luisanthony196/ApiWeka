@@ -2,8 +2,12 @@
 API REST desarrollada con el fin de aprovechar las capacidades en minería de datos y aprendizaje automático que brinda la plataforma Weka, y ampliar su uso en navegadores web y dispositivos móviles.
 
 ## Requerimientos
+Entorno local
 - Java 11
 - Maven
+Despliegue
+- Java 8 (Heroku)
+- La carptea **wekafiles**
 
 ## Conexión a Base de Datos
 - Configurar adecuadamente el archivo **DatabaseUtils.prop**
@@ -19,4 +23,7 @@ Ejecutar la aplicación como un servidor
 ## Rutas
 Agregar en {num} el numero de clusters
 - localhost:8080/api/simplekmean/{num}
-- localhost:8080/api/hierarchical/{num}
+num: es el numero de clusters
+- localhost:8080/api/hierarchical/?link=single$clusters=3
+link: es el criterio de vinculacion (single, complete, average, mean, centroid, ward)
+clusters: es el numero de clusters requerido
