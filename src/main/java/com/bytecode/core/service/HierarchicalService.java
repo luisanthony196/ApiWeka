@@ -15,6 +15,7 @@ import weka.core.DistanceFunction;
 import weka.core.EuclideanDistance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
 
 @Service
 public class HierarchicalService {
@@ -30,8 +31,9 @@ public class HierarchicalService {
     public int m_nLinkType = SINGLE;
     public Node[] m_clusters;
     public int[] m_nClusterNr;
+    public double[] instanceStats;
 
-    public void init(Instances data) {
+    public void init(Instances data) throws Exception {
         m_instances = data;
         int nInstances = m_instances.numInstances();
         int nClusters = data.numInstances();
@@ -39,7 +41,7 @@ public class HierarchicalService {
         // instancias, va a usar los atributos y las distancias entre
         // cada dato
         m_DistanceFunction.setInstances(m_instances);
-        // Inicializamos un arreglo de Vectores, un Vector por cada instancia 
+        // Inicializamos un arreglo de Vectores, un Vector por cada instancia
         // (guarda el indice), cada Vector guarda una serie de enteros
         @SuppressWarnings("unchecked")
         Vector<Integer>[] nClusterID = new Vector[data.numInstances()];
@@ -65,13 +67,22 @@ public class HierarchicalService {
                 iCurrent++;
             }
         }
+        eval(data);
+        // System.out.println("Instancias: " + m_instances.numInstances());
+        // System.out.println("Atributos: " + m_instances.numAttributes());
+        // String inst = "\t";
+        // for (int i = 0; i < m_instances.numAttributes(); i++) {
+        //     inst += m_instances.attribute(i).name() + " ";
+        // }
+        // System.out.println(inst);
+        // System.out.println("Cluster field widht: " + (Math.log(m_nNumClusters) / Math.log(10)) + 1);
+
     }
 
     public Result obtenerResultados() {
-        StringBuffer buf = new StringBuffer();
         Cluster[] grupo = new Cluster[m_clusters.length];
         int attIndex = m_instances.classIndex();
-        int total = m_clusters.length;
+        int total = m_instances.numInstances();
         if (attIndex < 0) {
             // try find a string, or last attribute otherwise
             attIndex = 0;
@@ -87,15 +98,13 @@ public class HierarchicalService {
             if (numberOfClusters > 0) {
                 for (int i = 0; i < m_clusters.length; i++) {
                     if (m_clusters[i] != null) {
-                        buf.append("Cluster " + i + "\n");
                         if (m_instances.attribute(attIndex).isString()) {
-                            buf.append(m_clusters[i].toString(attIndex, m_instances));
-                            grupo[i] = new Cluster(i, m_clusters[i].toString(attIndex, m_instances), 1, 1);
+                            grupo[i] = new Cluster(i, m_clusters[i].toString(attIndex, m_instances), (int) instanceStats[i], total);
                         } else {
-                            buf.append(m_clusters[i].toString2(attIndex, m_instances));
-                            grupo[i] = new Cluster(i, m_clusters[i].toString2(attIndex, m_instances), 1, 1);
+                            grupo[i] = new Cluster(i, m_clusters[i].toString2(attIndex, m_instances), (int) instanceStats[i], total);
                         }
-                        buf.append("\n\n");
+                    } else {
+                        grupo[i] = new Cluster(i, "", (int) instanceStats[i], total);
                     }
                 }
             }
@@ -103,6 +112,28 @@ public class HierarchicalService {
             e.printStackTrace();
         }
         return new Result("", total, grupo);
+    }
+
+    public void eval(Instances data) throws Exception {
+        DataSource source = new DataSource(data);
+        Instances testRaw = source.getStructure(data.classIndex());
+        instanceStats = new double[m_nNumClusters];
+        Instance insta;
+        while (source.hasMoreElements(testRaw)) {
+            // next instance
+            insta = source.nextElement(testRaw);
+
+            int cnum = -1;
+            try {
+                cnum = clusterInstance(insta);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+
+            if (cnum != -1) {
+                instanceStats[cnum]++;
+            }
+        }
     }
 
     public void doLinkClustering(int nClusters, Vector<Integer>[] nClusterID, Node[] clusterNodes) {
@@ -133,12 +164,8 @@ public class HierarchicalService {
             // poll obtiene el menos prioritario = menor distancia
             do {
                 t = queue.poll();
-            } while (
-                t != null && (
-                    nClusterID[t.m_iCluster1].size() != t.m_nClusterSize1 ||
-                    nClusterID[t.m_iCluster2].size() != t.m_nClusterSize2
-                )
-            );
+            } while (t != null && (nClusterID[t.m_iCluster1].size() != t.m_nClusterSize1
+                    || nClusterID[t.m_iCluster2].size() != t.m_nClusterSize2));
             // Guardamos temporalmente los clusters de la tupla, los combinamos
             // y lo guardamos en el arreglo de nodos
             iMin1 = t.m_iCluster1;
@@ -359,7 +386,7 @@ public class HierarchicalService {
     } // getDistance
 
     // =========================
-    // Method for WARD DISTANCE
+    // Complemented methods
     // =========================
 
     /** calculated error sum-of-squares for instances wrt centroid **/
@@ -383,6 +410,22 @@ public class HierarchicalService {
         }
         return fESS / cluster.size();
     } // calcESS
+
+    public int clusterInstance(Instance instance) throws Exception {
+        if (m_instances.numInstances() == 0) {
+            return 0;
+        }
+        double fBestDist = Double.MAX_VALUE;
+        int iBestInstance = -1;
+        for (int i = 0; i < m_instances.numInstances(); i++) {
+            double fDist = m_DistanceFunction.distance(instance, m_instances.instance(i));
+            if (fDist < fBestDist) {
+                fBestDist = fDist;
+                iBestInstance = i;
+            }
+        }
+        return m_nClusterNr[iBestInstance];
+    }
 
     // =========================
     // Set and get methods

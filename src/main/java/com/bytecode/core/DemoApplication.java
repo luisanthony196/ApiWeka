@@ -9,6 +9,6 @@ public class DemoApplication {
 	public static void main (String[] args) {
 		ConfigurableApplicationContext c = SpringApplication.run(DemoApplication.class, args);
 
-		System.out.println("You aren't welcome to Spring Boot");
+		System.out.println("Service activated with id: " + c.getId());
 	}
 }
