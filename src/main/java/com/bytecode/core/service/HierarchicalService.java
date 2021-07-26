@@ -1,5 +1,6 @@
 package com.bytecode.core.service;
 
+import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
@@ -32,6 +33,7 @@ public class HierarchicalService {
     public Node[] m_clusters;
     public int[] m_nClusterNr;
     public double[] instanceStats;
+    public String arbol = "";
 
     public void init(Instances data) throws Exception {
         m_instances = data;
@@ -79,6 +81,41 @@ public class HierarchicalService {
 
     }
 
+    public HashMap<Integer, String[]> obtenerLista() {
+        HashMap<Integer, String[]> h = new HashMap<Integer, String[]>();
+        for (int i = 0; i < m_clusters.length; i++) {
+            if (m_clusters[i] != null) {
+                inorder(m_clusters[i]);
+                String[] data = arbol.split(";");
+                h.put(i, data);
+                System.out.println("Cluster " + i);
+                System.out.println(arbol);
+                arbol = "";
+            }
+        }
+        return h;
+    }
+
+    public void inorder(Node t) {
+        if (t.m_left == null){
+            if (t.m_right == null){
+                arbol += m_instances.instance(t.m_iLeftInstance).stringValue(0) + ":" + m_instances.instance(t.m_iLeftInstance).stringValue(1) + ";";
+                arbol += m_instances.instance(t.m_iRightInstance).stringValue(0) + ":" + m_instances.instance(t.m_iRightInstance).stringValue(1) + ";";
+            } else {
+                arbol += m_instances.instance(t.m_iLeftInstance).stringValue(0) + ":" + m_instances.instance(t.m_iLeftInstance).stringValue(1) + ";";
+                inorder(t.m_right);
+            }
+        } else {
+            if (t.m_right == null){
+                inorder(t.m_left);
+                arbol += m_instances.instance(t.m_iRightInstance).stringValue(0) + ":" + m_instances.instance(t.m_iRightInstance).stringValue(1) + ";";
+            } else {
+                inorder(t.m_left);
+                inorder(t.m_right);
+            }
+        }
+    }
+
     public Result obtenerResultados() {
         Cluster[] grupo = new Cluster[m_clusters.length];
         int attIndex = m_instances.classIndex();
@@ -94,6 +131,7 @@ public class HierarchicalService {
             }
         }
         try {
+            // Elegimos el menor numero, los clusteres pedidos o el numero de instancias
             int numberOfClusters = Math.min(m_nNumClusters, m_instances.numInstances());
             if (numberOfClusters > 0) {
                 for (int i = 0; i < m_clusters.length; i++) {

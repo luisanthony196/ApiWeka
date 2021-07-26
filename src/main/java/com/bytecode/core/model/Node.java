@@ -16,9 +16,9 @@ public class Node implements Serializable {
     public Node m_parent;
     public int m_iLeftInstance;
     public int m_iRightInstance;
-    double m_fLeftLength = 0;
-    double m_fRightLength = 0;
-    double m_fHeight = 0;
+    public double m_fLeftLength = 0;
+    public double m_fRightLength = 0;
+    public double m_fHeight = 0;
 
     public String toString(int attIndex, Instances m_instances) {
       NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));

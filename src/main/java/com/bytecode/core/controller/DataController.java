@@ -1,5 +1,7 @@
 package com.bytecode.core.controller;
 
+import java.util.HashMap;
+
 import com.bytecode.core.model.Result;
 import com.bytecode.core.service.DataService;
 import com.bytecode.core.service.HierarchicalService;
@@ -43,6 +45,14 @@ public class DataController {
       System.err.print(e.getMessage());
     }
     return hierarchicalService.obtenerResultados();
+  }
+
+  @GetMapping("/hierarchical/list")
+  public HashMap<Integer, String[]> hierarchicalList() {
+    if(hierarchicalService.m_clusters == null) {
+      hierarchical("single", 2);
+    }
+    return hierarchicalService.obtenerLista();
   }
 
   @GetMapping("/simplekmean/{num}")
