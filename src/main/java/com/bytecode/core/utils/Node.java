@@ -1,4 +1,4 @@
-package com.bytecode.core.model;
+package com.bytecode.core.utils;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -19,6 +19,30 @@ public class Node implements Serializable {
     public double m_fLeftLength = 0;
     public double m_fRightLength = 0;
     public double m_fHeight = 0;
+    
+    public String inorder(Instances m_instances) {
+        if (m_left == null){
+            if (m_right == null){
+                return m_instances.instance(m_iLeftInstance).stringValue(0) + ":"
+                + m_instances.instance(m_iLeftInstance).stringValue(1) + ";"
+                + m_instances.instance(m_iRightInstance).stringValue(0) + ":"
+                + m_instances.instance(m_iRightInstance).stringValue(1) + ";";
+            } else {
+                return m_instances.instance(m_iLeftInstance).stringValue(0) + ":"
+                + m_instances.instance(m_iLeftInstance).stringValue(1) + ";"
+                + m_right.inorder(m_instances);
+            }
+        } else {
+            if (m_right == null){
+                return m_left.inorder(m_instances)
+                + m_instances.instance(m_iRightInstance).stringValue(0) + ":"
+                + m_instances.instance(m_iRightInstance).stringValue(1) + ";";
+            } else {
+                return m_left.inorder(m_instances)
+                + m_right.inorder(m_instances);
+            }
+        }
+    }
 
     public String toString(int attIndex, Instances m_instances) {
       NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));

@@ -1,6 +1,6 @@
 package com.bytecode.core.service;
 
-import com.bytecode.core.repository.DataRepository;
+import com.bytecode.core.repository.InstancesRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import weka.core.Instances;
 
 @Service
-public class DataService {
+public class InstancesService {
     @Autowired
-    DataRepository dataRepository;
+    InstancesRepository dataRepository;
 
     public Instances obtenerDatos() {
         if (dataRepository.isEmpty())

@@ -1,4 +1,4 @@
-package com.bytecode.core.model;
+package com.bytecode.core.model.units;
 
 public class Cluster {
     private int indice;
@@ -11,6 +11,13 @@ public class Cluster {
         this.valor = valor;
         this.tamanio = tamanio;
         this.porcentaje = tamanio * 100.0 / total;
+    }
+
+    public Cluster(int indice, String valor, int tamanio, double porcentaje) {
+        this.indice = indice;
+        this.valor = valor;
+        this.tamanio = tamanio;
+        this.porcentaje = porcentaje;
     }
     
     public int getIndice() {

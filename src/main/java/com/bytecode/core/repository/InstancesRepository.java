@@ -7,7 +7,7 @@ import weka.core.Instances;
 import weka.experiment.InstanceQuery;
 
 @Repository
-public class DataRepository {
+public class InstancesRepository {
 	private Instances datos = null;
 
     @Value("${database.username}")

@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
-import com.bytecode.core.model.Cluster;
-import com.bytecode.core.model.Node;
-import com.bytecode.core.model.Tuple;
-import com.bytecode.core.model.TupleComparator;
-import com.bytecode.core.model.Result;
+import com.bytecode.core.model.ClusteredInstances;
+import com.bytecode.core.model.HierarchicalCluster;
+import com.bytecode.core.utils.Tuple;
+import com.bytecode.core.utils.Node;
+import com.bytecode.core.utils.TupleComparator;
 
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,6 @@ public class HierarchicalService {
     public Node[] m_clusters;
     public int[] m_nClusterNr;
     public double[] instanceStats;
-    public String arbol = "";
 
     public void init(Instances data) throws Exception {
         m_instances = data;
@@ -70,56 +69,26 @@ public class HierarchicalService {
             }
         }
         eval(data);
-        // System.out.println("Instancias: " + m_instances.numInstances());
-        // System.out.println("Atributos: " + m_instances.numAttributes());
-        // String inst = "\t";
-        // for (int i = 0; i < m_instances.numAttributes(); i++) {
-        //     inst += m_instances.attribute(i).name() + " ";
-        // }
-        // System.out.println(inst);
-        // System.out.println("Cluster field widht: " + (Math.log(m_nNumClusters) / Math.log(10)) + 1);
-
     }
 
-    public HashMap<Integer, String[]> obtenerLista() {
-        HashMap<Integer, String[]> h = new HashMap<Integer, String[]>();
+    public ClusteredInstances obtenerLista() {
+        HashMap<Integer, String[]> hm = new HashMap<Integer, String[]>();
+        String[] atributos = new String[]{
+            m_instances.attribute(0).name(),
+            m_instances.attribute(1).name()
+        };
         for (int i = 0; i < m_clusters.length; i++) {
             if (m_clusters[i] != null) {
-                inorder(m_clusters[i]);
-                String[] data = arbol.split(";");
-                h.put(i, data);
-                System.out.println("Cluster " + i);
-                System.out.println(arbol);
-                arbol = "";
+                String arbol = m_clusters[i].inorder(m_instances);
+                hm.put(i, arbol.split(";"));
             }
         }
-        return h;
+        return new ClusteredInstances(m_clusters.length, atributos, hm);
     }
 
-    public void inorder(Node t) {
-        if (t.m_left == null){
-            if (t.m_right == null){
-                arbol += m_instances.instance(t.m_iLeftInstance).stringValue(0) + ":" + m_instances.instance(t.m_iLeftInstance).stringValue(1) + ";";
-                arbol += m_instances.instance(t.m_iRightInstance).stringValue(0) + ":" + m_instances.instance(t.m_iRightInstance).stringValue(1) + ";";
-            } else {
-                arbol += m_instances.instance(t.m_iLeftInstance).stringValue(0) + ":" + m_instances.instance(t.m_iLeftInstance).stringValue(1) + ";";
-                inorder(t.m_right);
-            }
-        } else {
-            if (t.m_right == null){
-                inorder(t.m_left);
-                arbol += m_instances.instance(t.m_iRightInstance).stringValue(0) + ":" + m_instances.instance(t.m_iRightInstance).stringValue(1) + ";";
-            } else {
-                inorder(t.m_left);
-                inorder(t.m_right);
-            }
-        }
-    }
-
-    public Result obtenerResultados() {
-        Cluster[] grupo = new Cluster[m_clusters.length];
+    public HierarchicalCluster obtenerResultados() {
+        HierarchicalCluster hc = new HierarchicalCluster();
         int attIndex = m_instances.classIndex();
-        int total = m_instances.numInstances();
         if (attIndex < 0) {
             // try find a string, or last attribute otherwise
             attIndex = 0;
@@ -133,23 +102,25 @@ public class HierarchicalService {
         try {
             // Elegimos el menor numero, los clusteres pedidos o el numero de instancias
             int numberOfClusters = Math.min(m_nNumClusters, m_instances.numInstances());
+            hc.setN_clusters(numberOfClusters);
+            hc.setN_instancias(m_instances.numInstances());;
             if (numberOfClusters > 0) {
                 for (int i = 0; i < m_clusters.length; i++) {
                     if (m_clusters[i] != null) {
                         if (m_instances.attribute(attIndex).isString()) {
-                            grupo[i] = new Cluster(i, m_clusters[i].toString(attIndex, m_instances), (int) instanceStats[i], total);
+                            hc.addCluster(i, m_clusters[i].toString(attIndex, m_instances), (int) instanceStats[i]);
                         } else {
-                            grupo[i] = new Cluster(i, m_clusters[i].toString2(attIndex, m_instances), (int) instanceStats[i], total);
+                            hc.addCluster(i, m_clusters[i].toString2(attIndex, m_instances), (int) instanceStats[i]);
                         }
                     } else {
-                        grupo[i] = new Cluster(i, "", (int) instanceStats[i], total);
+                        hc.addCluster(i, "", (int) instanceStats[i]);
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new Result("", total, grupo);
+        return hc;
     }
 
     public void eval(Instances data) throws Exception {

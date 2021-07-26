@@ -1,4 +1,4 @@
-package com.bytecode.core.model;
+package com.bytecode.core.utils;
 
 import java.util.Comparator;
 

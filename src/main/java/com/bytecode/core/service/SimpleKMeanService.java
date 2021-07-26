@@ -2,16 +2,16 @@ package com.bytecode.core.service;
 
 import org.springframework.stereotype.Service;
 
-import com.bytecode.core.model.Cluster;
-import com.bytecode.core.model.Result;
+import com.bytecode.core.model.units.Cluster;
+import com.bytecode.core.model.SimpleKMean;
 
 import weka.clusterers.SimpleKMeans;
 import weka.core.Utils;
 import weka.core.Instances;
 
 @Service
-public class ResultService {
-    public Result obtenerResultado(SimpleKMeans m) throws Exception {
+public class SimpleKMeanService {
+    public SimpleKMean obtenerResultado(SimpleKMeans m) throws Exception {
         int atributo = 0, max = -1, k = -1; // Por esta vez solo usamos 1 atributo
         Instances resultado = m.getClusterCentroids();
         Cluster[] grupo = new Cluster[m.numberOfClusters()];
@@ -30,6 +30,6 @@ public class ResultService {
             }
         }
         String fullData = resultado.attribute(atributo).value(k);
-        return new Result(fullData, total, grupo);
+        return new SimpleKMean(fullData, total, grupo);
     }
 }

@@ -1,4 +1,4 @@
-package com.bytecode.core.model;
+package com.bytecode.core.utils;
 
 public class Tuple {
     public Tuple(double d, int i, int j, int nSize1, int nSize2) {
