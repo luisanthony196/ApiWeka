@@ -10,6 +10,7 @@ import com.bytecode.core.utils.Tuple;
 import com.bytecode.core.utils.Node;
 import com.bytecode.core.utils.TupleComparator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import weka.core.DistanceFunction;
@@ -28,11 +29,30 @@ public class HierarchicalService {
     final static int MEAN = 3;
     final static int CENTROID = 4;
     final static int WARD = 5;
-    public int m_nNumClusters = 2;
-    public int m_nLinkType = SINGLE;
+    public int m_nNumClusters;
+    public int m_nLinkType;
     public Node[] m_clusters;
     public int[] m_nClusterNr;
     public double[] instanceStats;
+    @Autowired
+    InstancesService dataService;
+
+    public void initService(HashMap<String, Object> params) {
+        if (!params.containsKey("link"))
+            params.put("link", "single");
+        if (!params.containsKey("clusters"))
+            params.put("clusters", 2);
+        try {
+            // Se obtienen los datos
+            Instances data = dataService.obtenerDatos();
+            setLinkType((String) params.get("link"));
+            setNumClusters((int) params.get("clusters"));
+            // Se procesan las instancias
+            init(data);
+        } catch (Exception e) {
+            System.err.print(e.getMessage());
+        }
+    }
 
     public void init(Instances data) throws Exception {
         m_instances = data;
@@ -73,10 +93,7 @@ public class HierarchicalService {
 
     public ClusteredInstances obtenerLista() {
         HashMap<Integer, String[]> hm = new HashMap<Integer, String[]>();
-        String[] atributos = new String[]{
-            m_instances.attribute(0).name(),
-            m_instances.attribute(1).name()
-        };
+        String[] atributos = new String[] { m_instances.attribute(0).name(), m_instances.attribute(1).name() };
         for (int i = 0; i < m_clusters.length; i++) {
             if (m_clusters[i] != null) {
                 String arbol = m_clusters[i].inorder(m_instances);
@@ -86,7 +103,7 @@ public class HierarchicalService {
         return new ClusteredInstances(m_clusters.length, atributos, hm);
     }
 
-    public HierarchicalCluster obtenerResultados() {
+    public HierarchicalCluster obtenerModelo() {
         HierarchicalCluster hc = new HierarchicalCluster();
         int attIndex = m_instances.classIndex();
         if (attIndex < 0) {
@@ -103,7 +120,8 @@ public class HierarchicalService {
             // Elegimos el menor numero, los clusteres pedidos o el numero de instancias
             int numberOfClusters = Math.min(m_nNumClusters, m_instances.numInstances());
             hc.setN_clusters(numberOfClusters);
-            hc.setN_instancias(m_instances.numInstances());;
+            hc.setN_instancias(m_instances.numInstances());
+            ;
             if (numberOfClusters > 0) {
                 for (int i = 0; i < m_clusters.length; i++) {
                     if (m_clusters[i] != null) {
@@ -121,28 +139,6 @@ public class HierarchicalService {
             e.printStackTrace();
         }
         return hc;
-    }
-
-    public void eval(Instances data) throws Exception {
-        DataSource source = new DataSource(data);
-        Instances testRaw = source.getStructure(data.classIndex());
-        instanceStats = new double[m_nNumClusters];
-        Instance insta;
-        while (source.hasMoreElements(testRaw)) {
-            // next instance
-            insta = source.nextElement(testRaw);
-
-            int cnum = -1;
-            try {
-                cnum = clusterInstance(insta);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-
-            if (cnum != -1) {
-                instanceStats[cnum]++;
-            }
-        }
     }
 
     public void doLinkClustering(int nClusters, Vector<Integer>[] nClusterID, Node[] clusterNodes) {
@@ -195,6 +191,32 @@ public class HierarchicalService {
             nClusters--;
         }
     } // doLinkClustering
+
+    public void eval(Instances data) throws Exception {
+        DataSource source = new DataSource(data);
+        Instances testRaw = source.getStructure(data.classIndex());
+        instanceStats = new double[m_nNumClusters];
+        Instance insta;
+        while (source.hasMoreElements(testRaw)) {
+            // next instance
+            insta = source.nextElement(testRaw);
+
+            int cnum = -1;
+            try {
+                cnum = clusterInstance(insta);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+
+            if (cnum != -1) {
+                instanceStats[cnum]++;
+            }
+        }
+    }
+
+    // =========================
+    // Complemented methods
+    // =========================
 
     public void merge(int iMin1, int iMin2, double fDist1, double fDist2, Vector<Integer>[] nClusterID,
             Node[] clusterNodes) {
@@ -393,10 +415,6 @@ public class HierarchicalService {
         }
         return fBestDist;
     } // getDistance
-
-    // =========================
-    // Complemented methods
-    // =========================
 
     /** calculated error sum-of-squares for instances wrt centroid **/
     public double calcESS(Vector<Integer> cluster) {

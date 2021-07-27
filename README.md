@@ -1,29 +1,41 @@
 # API Weka
+
 API REST desarrollada con el fin de aprovechar las capacidades en minería de datos y aprendizaje automático que brinda la plataforma Weka, y ampliar su uso en navegadores web y dispositivos móviles.
 
 ## Requerimientos
-Entorno local
+
 - Java 11
 - Maven
-Despliegue
-- Java 8 (Heroku)
-- La carptea **wekafiles**
+- La carpeta **wekafiles**
 
 ## Conexión a Base de Datos
+
 - Configurar adecuadamente el archivo **DatabaseUtils.prop**
 - Ingresar el *username* y el *password* en el archivo **application.properties**
 
 ## Scripts
+
 Limpiar e instalar las librerías (dependencias)
-- mvnw.cmd clean install
+- windows: `mvnw.cmd clean install`
+- maven: `mvn clean install`
 
 Ejecutar la aplicación como un servidor
-- mvnw.cmd spring-boot:run
+- windows `mvnw.cmd spring-boot:run`
+- maven: `mvn spring-boot:run`
 
 ## Rutas
 Agregar en {num} el numero de clusters
-- localhost:8080/api/simplekmean/{num}
-num: es el numero de clusters
-- localhost:8080/api/hierarchical/?link=single$clusters=3
-link: es el criterio de vinculacion (single, complete, average, mean, centroid, ward)
-clusters: es el numero de clusters requerido
+
+### Hierarchical Service
+| Ruta | Metodo | Parametros |
+| ------ | ------ | ------ |
+| localhost:8080/api/hierarchical | POST | link (String), clusters (int) |
+| localhost:8080/api/hierarchical/list | POST |  |
+* link: es el criterio de vinculacion (single, complete, average, mean, centroid, ward)
+* clusters: es el numero de clusters requerido
+
+### SimpleKMean Service
+| Ruta | Metodo | Parametros |
+| ------ | ------ | ------ |
+| localhost:8080/api/simplekmean/{num} | GET | num (int) |
+* num: es el numero de clusters
