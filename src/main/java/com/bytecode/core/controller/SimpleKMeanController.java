@@ -2,6 +2,7 @@ package com.bytecode.core.controller;
 
 import java.util.HashMap;
 
+import com.bytecode.core.model.ClusteredInstances;
 import com.bytecode.core.model.SimpleKMeanCluster;
 import com.bytecode.core.service.SimpleKMeanService;
 
@@ -26,8 +27,8 @@ public class SimpleKMeanController {
     return simpleKMeanService.toSimpleKMeansCluster();
   }
 
-  // @PostMapping("/list")
-  // public ClusteredInstances hierarchicalList() {
-  //   return hierarchicalService.toClusteredInstances();
-  // }
+  @PostMapping("/list")
+  public ClusteredInstances simplekmeanlist() {
+    return simpleKMeanService.toClusteredInstances();
+  }
 }

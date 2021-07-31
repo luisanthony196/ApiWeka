@@ -8,6 +8,7 @@ import com.bytecode.core.utils.SimpleKMeansModify;
 
 import java.util.HashMap;
 
+import com.bytecode.core.model.ClusteredInstances;
 import com.bytecode.core.model.SimpleKMeanCluster;
 
 import weka.core.Instances;
@@ -46,15 +47,15 @@ public class SimpleKMeanService {
         return null;
     }
 
-    // public ClusteredInstances toClusteredInstances() {
-    //     try {
-    //         if (skm == null) {
-    //             initService(new HashMap<String, Object>());
-    //         }
-    //         return skm.toClusteredInstances();
-    //     } catch (Exception e) {
-    //         System.err.print(e.getMessage());
-    //     }
-    //     return null;
-    // }
+    public ClusteredInstances toClusteredInstances() {
+        try {
+            if (skm == null) {
+                initService(new HashMap<String, Object>());
+            }
+            return skm.toClusteredInstances();
+        } catch (Exception e) {
+            System.err.print(e.getMessage());
+        }
+        return null;
+    }
 }

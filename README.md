@@ -7,11 +7,9 @@ API REST desarrollada con el fin de aprovechar las capacidades en minería de da
 - Java 11
 - Maven
 - La carpeta **wekafiles**
-
-## Conexión a Base de Datos
-
-- Configurar adecuadamente el archivo **DatabaseUtils.prop**
-- Ingresar el *username* y el *password* en el archivo **application.properties**
+- Conexión a Base de Datos
+    - Configurar adecuadamente el archivo **DatabaseUtils.prop**
+    - Ingresar el *username* y el *password* en el archivo **application.properties**
 
 ## Scripts
 
@@ -37,5 +35,7 @@ Rutas para acceder por medio de una ejecucion en un entorno local, las rutas de 
 ### SimpleKMean Service
 | Ruta | Metodo | Parametros |
 | ------ | ------ | ------ |
-| localhost:8080/api/simplekmean/{num} | GET | num (int) |
-* num: es el numero de clusters
+| localhost:8080/api/simplekmean | POST | clusters (int) |
+| localhost:8080/api/simplekmean/list | POST |  |
+* link: es el criterio de vinculacion (single, complete, average, mean, centroid, ward)
+* clusters: es el numero de clusters requerido# API Weka
