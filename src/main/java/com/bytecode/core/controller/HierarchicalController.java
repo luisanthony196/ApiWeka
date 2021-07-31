@@ -5,7 +5,6 @@ import java.util.HashMap;
 import com.bytecode.core.model.ClusteredInstances;
 import com.bytecode.core.model.HierarchicalCluster;
 import com.bytecode.core.service.HierarchicalService;
-import com.bytecode.core.service.InstancesService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,8 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class HierarchicalController {
   @Autowired
   HierarchicalService hierarchicalService;
-  @Autowired
-  InstancesService dataService;
 
   @PostMapping("")
   public HierarchicalCluster hierarchical(@RequestBody HashMap<String, Object> params) {

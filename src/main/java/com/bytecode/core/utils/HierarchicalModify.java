@@ -13,7 +13,6 @@ import weka.core.SelectedTag;
 public class HierarchicalModify extends HierarchicalClusterer{
     public Instances n_instances;
     public int n_clusters;
-    Node[] c_clusters;
     int[] instanceStats;
     boolean ready = false;
 

@@ -24,7 +24,7 @@ Ejecutar la aplicación como un servidor
 - maven: `mvn spring-boot:run`
 
 ## Rutas
-Agregar en {num} el numero de clusters
+Rutas para acceder por medio de una ejecucion en un entorno local, las rutas de acceso estan descritas en el Trello
 
 ### Hierarchical Service
 | Ruta | Metodo | Parametros |

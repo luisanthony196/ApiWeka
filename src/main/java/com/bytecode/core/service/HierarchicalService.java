@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.bytecode.core.model.ClusteredInstances;
 import com.bytecode.core.model.HierarchicalCluster;
+import com.bytecode.core.repository.InstancesRepository;
 import com.bytecode.core.utils.HierarchicalModify;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import weka.core.Instances;
 @Service
 public class HierarchicalService {
     @Autowired
-    InstancesService dataService;
+    InstancesRepository instancesRepository;
 
     HierarchicalModify hm;
 
@@ -26,7 +27,7 @@ public class HierarchicalService {
         try {
             hm = new HierarchicalModify();
             // Se obtienen los datos
-            Instances data = dataService.obtenerDatos();
+            Instances data = instancesRepository.obtenerDatos();
             hm.setLink((String) params.get("link"));
             hm.setNumClusters((int) params.get("clusters"));
             // Se procesan las instancias

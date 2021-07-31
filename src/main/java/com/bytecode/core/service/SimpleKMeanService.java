@@ -1,35 +1,60 @@
 package com.bytecode.core.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bytecode.core.model.units.Cluster;
-import com.bytecode.core.model.SimpleKMean;
+import com.bytecode.core.repository.InstancesRepository;
+import com.bytecode.core.utils.SimpleKMeansModify;
 
-import weka.clusterers.SimpleKMeans;
-import weka.core.Utils;
+import java.util.HashMap;
+
+import com.bytecode.core.model.SimpleKMeanCluster;
+
 import weka.core.Instances;
 
 @Service
 public class SimpleKMeanService {
-    public SimpleKMean obtenerResultado(SimpleKMeans m) throws Exception {
-        int atributo = 0, max = -1, k = -1; // Por esta vez solo usamos 1 atributo
-        Instances resultado = m.getClusterCentroids();
-        Cluster[] grupo = new Cluster[m.numberOfClusters()];
-        int total = (int) Utils.sum(m.getClusterSizes());
-        for (int i = 0; i < m.numberOfClusters(); i++) {
-            int index = (int) resultado.instance(i).value(atributo);
-            grupo[i] = new Cluster(
-                i,
-                resultado.attribute(atributo).value(index),
-                (int) m.getClusterSizes()[i],
-                total
-            );
-            if ((int) m.getClusterSizes()[i] > max) {
-                k = index;
-                max = (int) m.getClusterSizes()[i];
-            }
+    @Autowired
+    InstancesRepository instancesRepository;
+
+    SimpleKMeansModify skm;
+
+    public void initService(HashMap<String, Object> params) {
+        if (!params.containsKey("link"))
+            params.put("link", "single");
+        if (!params.containsKey("clusters"))
+            params.put("clusters", 2);
+        try {
+            skm = new SimpleKMeansModify();
+            // Se obtienen los datos
+            Instances datos = instancesRepository.obtenerDatos();
+            // Generacion del modelo
+            skm.setNumClusters((int) params.get("clusters"));
+            // Se procesan las instancias
+            skm.buildClusterer(datos);
+        } catch (Exception e) {
+            System.err.print(e.getMessage());
         }
-        String fullData = resultado.attribute(atributo).value(k);
-        return new SimpleKMean(fullData, total, grupo);
     }
+
+    public SimpleKMeanCluster toSimpleKMeansCluster() {
+        try {
+            return skm.toSimpleKMeansCluster();
+        } catch (Exception e) {
+            System.err.print(e.getMessage());
+        }
+        return null;
+    }
+
+    // public ClusteredInstances toClusteredInstances() {
+    //     try {
+    //         if (skm == null) {
+    //             initService(new HashMap<String, Object>());
+    //         }
+    //         return skm.toClusteredInstances();
+    //     } catch (Exception e) {
+    //         System.err.print(e.getMessage());
+    //     }
+    //     return null;
+    // }
 }

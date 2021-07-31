@@ -16,6 +16,19 @@ public class InstancesRepository {
     @Value("${database.password}")
     private String password;
 
+    public Instances obtenerDatos() {
+        if (isEmpty())
+            llenarDatos();
+        return datos;
+    }
+
+    public void listarDatos(Instances d) {
+        System.out.println("\nNumero de atributos" + d.numAttributes());
+        for (int i = 0; i < d.numAttributes(); i++) {
+            System.out.println("Atributo Nro" + (i+1) + ": " + d.attribute(i).name());
+        }
+    }
+
     public void llenarDatos() {
         try {
             InstanceQuery query = new InstanceQuery();
@@ -35,9 +48,5 @@ public class InstancesRepository {
         if (datos.isEmpty())
             return true;
         return false;
-    }
-
-    public Instances obtenerDatos() {
-        return datos;
     }
 }
