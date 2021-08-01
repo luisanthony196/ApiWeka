@@ -49,25 +49,16 @@ public class HierarchicalModify extends HierarchicalClusterer{
     }
 
     public ClusteredInstances toClusteredInstances() throws Exception {
-        HashMap<Integer, String[]> hm = new HashMap<Integer, String[]>();
-        String[] atributos = new String[] { n_instances.attribute(0).name(), n_instances.attribute(1).name() };
-        // Lista donde se guardara la informacion de las
-        // instancias, ademas de inicializarlo
-        String[] listClusters = new String[n_clusters];
-        for (int i = 0; i < n_clusters; i++) {
-            listClusters[i] = "";
-        }
+        ClusteredInstances ci = new ClusteredInstances();
+        ci.setN_clusters(numberOfClusters());
+        ci.setAtributos(new String[]{n_instances.attribute(0).name(), n_instances.attribute(1).name()});
         // Iteracion que aglomear en cada unidad de listClusters
         // las instancias que pertencen a 'i' cluster
         for (int i = 0; i < n_instances.numInstances(); i++) {
             Instance inst = n_instances.get(i);
-            listClusters[clusterInstance(inst)] += inst.stringValue(0) + ":" + inst.stringValue(1) + ";";
+            ci.addInstance(i, new String[]{inst.stringValue(0), inst.stringValue(1)}, clusterInstance(inst));
         }
-        // Agregamos clusters al HashMap
-        for (int i = 0; i < n_clusters; i++) {
-            hm.put(i, listClusters[i].split(";"));
-        }
-        return new ClusteredInstances(n_clusters, atributos, hm);
+        return ci;
     }
 
     public void eval() throws Exception {

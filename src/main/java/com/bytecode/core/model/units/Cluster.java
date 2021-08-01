@@ -1,5 +1,7 @@
 package com.bytecode.core.model.units;
 
+import java.text.DecimalFormat;
+
 public class Cluster {
     private int indice;
     private String valor;
@@ -44,8 +46,9 @@ public class Cluster {
         this.tamanio = tamanio;
     }
 
-    public Double getPorcentaje() {
-        return this.porcentaje;
+    public String getPorcentaje() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(this.porcentaje);
     }
 
     public void setPorcentaje(Double porcentaje) {

@@ -1,16 +1,21 @@
 package com.bytecode.core.model;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bytecode.core.model.units.Instance;
 
 public class ClusteredInstances {
     int n_clusters;
     String[] atributos;
-    HashMap<Integer, String[]> clusters;
+    List<Instance> instances;
 
-    public ClusteredInstances(int n_clusters, String[] atributos, HashMap<Integer, String[]> clusters) {
-        this.n_clusters = n_clusters;
-        this.atributos = atributos;
-        this.clusters = clusters;
+    public ClusteredInstances() {
+        instances= new ArrayList<Instance>();
+    }
+
+    public void addInstance(int indice, String[] attr, int cluster){
+        this.instances.add(new Instance(indice, attr[0], attr[1], cluster));
     }
 
     public String[] getAtributos() {
@@ -29,12 +34,11 @@ public class ClusteredInstances {
         this.n_clusters = n_clusters;
     }
 
-    public HashMap<Integer, String[]> getClusters() {
-		return this.clusters;
-	}
+    public List<Instance> getInstances() {
+        return this.instances;
+    }
 
-    public void setClusters(HashMap<Integer, String[]> clusters) {
-		this.clusters = clusters;
-	}
-
+    public void setInstances(List<Instance> instances) {
+        this.instances = instances;
+    }
 }
