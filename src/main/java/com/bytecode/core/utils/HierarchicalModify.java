@@ -1,7 +1,5 @@
 package com.bytecode.core.utils;
 
-import java.util.HashMap;
-
 import com.bytecode.core.model.ClusteredInstances;
 import com.bytecode.core.model.HierarchicalCluster;
 

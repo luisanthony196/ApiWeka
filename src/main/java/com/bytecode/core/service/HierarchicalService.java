@@ -20,6 +20,8 @@ public class HierarchicalService {
     HierarchicalModify hm;
 
     public void initService(HashMap<String, Object> params) {
+        String[] options;
+        String split = "";
         if (!params.containsKey("link"))
             params.put("link", "single");
         if (!params.containsKey("clusters"))
@@ -28,8 +30,13 @@ public class HierarchicalService {
             hm = new HierarchicalModify();
             // Se obtienen los datos
             Instances data = instancesRepository.obtenerDatos();
-            hm.setLink((String) params.get("link"));
-            hm.setNumClusters((int) params.get("clusters"));
+            // hm.setLink((String) params.get("link"));
+            // hm.setNumClusters((int) params.get("clusters"));
+            split += "-N " + params.get("clusters");
+            split += " -L " + ((String) params.get("link")).toUpperCase();
+            split += " -P";
+            options = weka.core.Utils.splitOptions(split);
+            hm.setOptions(options);
             // Se procesan las instancias
             hm.buildClusterer(data);
         } catch (Exception e) {
