@@ -9,6 +9,7 @@ public class HierarchicalCluster {
     private int n_instancias;
     private int n_clusters;
     private List<Cluster> clusters;
+    private String image;
 
     public HierarchicalCluster() {
         clusters = new ArrayList<Cluster>();
@@ -41,5 +42,13 @@ public class HierarchicalCluster {
 
     public void setClusters(List<Cluster> clusters) {
         this.clusters = clusters;
+    }
+
+    public String getImage() {
+        return this.image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
