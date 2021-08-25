@@ -65,12 +65,20 @@ public class HierarchicalModify extends HierarchicalClusterer{
     public ClusteredInstances toClusteredInstances() throws Exception {
         ClusteredInstances ci = new ClusteredInstances();
         ci.setN_clusters(numberOfClusters());
-        ci.setAtributos(new String[]{n_instances.attribute(0).name(), n_instances.attribute(1).name()});
+        String[] att = new String[n_instances.numAttributes()];
+        for (int i =0; i < n_instances.numAttributes(); i++) {
+            att[i] = n_instances.attribute(i).name();
+        }
+        ci.setAtributos(att);
         // Iteracion que aglomear en cada unidad de listClusters
         // las instancias que pertencen a 'i' cluster
         for (int i = 0; i < n_instances.numInstances(); i++) {
             Instance inst = n_instances.get(i);
-            ci.addInstance(i, new String[]{inst.stringValue(0), inst.stringValue(1)}, clusterInstance(inst));
+            String[] attr = new String[n_instances.numAttributes()];
+            for (int j = 0; j < n_instances.numAttributes(); j++) {
+                attr[j] = inst.stringValue(j);
+            }
+            ci.addInstance(i, attr, clusterInstance(inst));
         }
         return ci;
     }

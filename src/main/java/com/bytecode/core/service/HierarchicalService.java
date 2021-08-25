@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.bytecode.core.model.ClusteredInstances;
 import com.bytecode.core.model.HierarchicalCluster;
 import com.bytecode.core.repository.InstancesRepository;
+import com.bytecode.core.utils.DistanceFunction;
 import com.bytecode.core.utils.HierarchicalModify;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,26 +16,34 @@ import weka.core.Instances;
 @Service
 public class HierarchicalService {
     @Autowired
-    InstancesRepository instancesRepository;
+    InstancesRepository ir;
 
     HierarchicalModify hm;
 
     public void initService(HashMap<String, Object> params) {
         String[] options;
         String split = "";
-        if (!params.containsKey("link"))
-            params.put("link", "single");
-        if (!params.containsKey("clusters"))
-            params.put("clusters", 2);
+        if (!params.containsKey("columns")) // Columnas de la base de datos
+            params.put("columns", "[\"htitulo_cat\", \"htitulo\"]");
+        if (!params.containsKey("aglo-linkage")) // Metodo de enlace de Hierarchical
+            params.put("aglo-linkage", "single");
+        if (!params.containsKey("jerarq-method")) // Metodo de enlace para el dendrograma
+            params.put("jerarq-method", params.get("aglo-linkage").toString());
+        if (!params.containsKey("n_clusters")) // Numero de clusters para dividir
+            params.put("n_clusters", 2);
+        if (!params.containsKey("aglo-affinity")) // Metrica para medir el enlazamiento
+            params.put("aglo-affinity", "euclidean");
         try {
             hm = new HierarchicalModify();
             // Se obtienen los datos
-            Instances data = instancesRepository.obtenerDatos();
+            ir.setColumns(params.get("columns").toString());
+            Instances data = ir.obtenerDatos();
             // hm.setLink((String) params.get("link"));
             // hm.setNumClusters((int) params.get("clusters"));
-            split += "-N " + params.get("clusters");
-            split += " -L " + ((String) params.get("link")).toUpperCase();
+            split += "-N " + params.get("n_clusters");
+            split += " -L " + ((String) params.get("aglo-linkage")).toUpperCase();
             split += " -P";
+            // split += " -A \"" + DistanceFunction.hp.get(params.get("aglo-affinity").toString()) + "\"";
             options = weka.core.Utils.splitOptions(split);
             hm.setOptions(options);
             // Se procesan las instancias
