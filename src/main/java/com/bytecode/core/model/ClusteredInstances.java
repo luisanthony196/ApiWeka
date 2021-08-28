@@ -16,9 +16,10 @@ public class ClusteredInstances {
     public void addInstance(int indice, String[] attr, int cluster){
         HashMap<String, Object> hp = new HashMap<>();
         hp.put("indice", indice);
-        for (int i = 0; i < attr.length; i++) {
-            hp.put("attr" + i, attr[i]);
-        }
+        hp.put("atributos", attr);
+        // for (int i = 0; i < attr.length; i++) {
+        //     hp.put("attr" + i, attr[i]);
+        // }
         hp.put("cluster", cluster);
         instances.add(hp);
     }
