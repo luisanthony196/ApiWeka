@@ -5,7 +5,6 @@ import java.util.HashMap;
 import com.bytecode.core.model.ClusteredInstances;
 import com.bytecode.core.model.HierarchicalCluster;
 import com.bytecode.core.repository.InstancesRepository;
-import com.bytecode.core.utils.DistanceFunction;
 import com.bytecode.core.utils.HierarchicalModify;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,6 @@ public class HierarchicalService {
     public void initService(HashMap<String, Object> params) {
         String[] options;
         String split = "";
-        if (!params.containsKey("columns")) // Columnas de la base de datos
-            params.put("columns", "[\"htitulo_cat\", \"htitulo\"]");
         if (!params.containsKey("aglo-linkage")) // Metodo de enlace de Hierarchical
             params.put("aglo-linkage", "single");
         if (!params.containsKey("jerarq-method")) // Metodo de enlace para el dendrograma
@@ -36,7 +33,7 @@ public class HierarchicalService {
         try {
             hm = new HierarchicalModify();
             // Se obtienen los datos
-            ir.setColumns(params.get("columns").toString());
+            ir.setQuery(params.get("columns"), params.get("query"));
             Instances data = ir.obtenerDatos();
             // hm.setLink((String) params.get("link"));
             // hm.setNumClusters((int) params.get("clusters"));

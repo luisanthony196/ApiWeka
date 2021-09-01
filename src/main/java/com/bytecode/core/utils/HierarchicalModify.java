@@ -94,19 +94,21 @@ public class HierarchicalModify extends HierarchicalClusterer{
         int n = n_instances.numInstances();
         double[][] proximity = new double[n][n];
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < i+1; j++) {
-                if (i == j)
-                    proximity[i][j] = 0;
-                else {
-                    Instance inst1 = n_instances.get(i);
-                    Instance inst2 = n_instances.get(j);
-                    proximity[i][j] = (inst1.valueSparse(0) + inst1.valueSparse(1)) / 2;
-                    proximity[j][i] = (inst2.valueSparse(0) + inst2.valueSparse(1)) / 2;
-                }
+            for (int j = 0; j < i; j++) {
+                Instance inst1 = n_instances.get(i);
+                Instance inst2 = n_instances.get(j);
+                proximity[i][j] = this.getDistanceFunction().distance(inst1, inst2);
+                // System.out.print("[" + j + "-" + proximity[i][j] + "]");
+                // double val = inst1.valueSparse(0) - inst2.valueSparse(0);
+                // proximity[i][j] = (inst1.valueSparse(0) + inst1.valueSparse(1)) / 2;
+                // proximity[j][i] = (inst2.valueSparse(0) + inst2.valueSparse(1)) / 2;
             }
         }
         var clusters = HierarchicalClustering.fit(getLinkage(proximity));
-        var canvas = new Dendrogram(clusters.getTree(), clusters.getHeight()).canvas();
+        var canvas = new Dendrogram(clusters.getTree(), clusters.getHeight())
+            .canvas()
+            .setTitle("Dendrograma")
+            .setAxisLabels("Instancias", "Distancia");
         String imageString = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -124,28 +126,28 @@ public class HierarchicalModify extends HierarchicalClusterer{
         Linkage link;
         switch (Integer.parseInt(getLinkType().toString())) {
             case 0:
-                link = SingleLinkage.of(data);
+                link = new SingleLinkage(data);
                 break;
             case 1:
-                link = CompleteLinkage.of(data);
+                link = new CompleteLinkage(data);
                 break;
             case 2:
-                link = UPGMALinkage.of(data);
+                link = new UPGMALinkage(data);
                 break;
             case 3:
-                link = WPGMCLinkage.of(data);
+                link = new WPGMCLinkage(data);
                 break;
             case 4:
-                link = UPGMCLinkage.of(data);
+                link = new UPGMCLinkage(data);
                 break;
             case 5:
-                link = WardLinkage.of(data);
+                link = new WardLinkage(data);
                 break;
             case 6:
-                link = WPGMALinkage.of(data);
+                link = new WPGMALinkage(data);
                 break;
             default: // Si no se especifica es SINGLE
-                link = SingleLinkage.of(data);
+                link = new SingleLinkage(data);
                 break;
         }
         return link;

@@ -9,7 +9,7 @@ import weka.experiment.InstanceQuery;
 @Repository
 public class InstancesRepository {
 	private Instances datos = null;
-    protected String columns;
+    protected String queryString;
 
     @Value("${database.username}")
     private String username;
@@ -28,7 +28,7 @@ public class InstancesRepository {
             InstanceQuery query = new InstanceQuery();
             query.setUsername(this.username);
             query.setPassword(this.password);
-            query.setQuery("select distinct " + columns + " from oferta where id_estado is null order by 1,2 limit 500");
+            query.setQuery(this.queryString);
             datos = query.retrieveInstances();
             System.out.println("Se llenaron los datos");
         } catch (Exception e) {
@@ -44,13 +44,31 @@ public class InstancesRepository {
         return false;
     }
 
-    public void setColumns(String columns) {
-        String temp = columns.replaceAll("\\[|\\]", "");
-        if (this.columns == null) {
-            this.columns = temp;
-        } else if (!this.columns.equals(temp)){
-            this.datos = null;
-            this.columns = temp;
+    public void setQuery(Object columns, Object query) {
+        if (query == null) {
+            if (columns == null) {
+                this.queryString = null;
+            } else {
+                String temp = columns.toString().replaceAll("\\[|\\]", "");
+                this.queryString = "select distinct " + temp + " from oferta where id_estado is null order by 1,2 limit 1000";
+            }
+        } else {
+            if (this.queryString == null) {
+                this.queryString = query.toString() + " limit 1000";
+            } else if (!this.queryString.equals(query.toString())) {
+                this.datos = null;
+                this.queryString = query.toString() + " limit 1000";
+            }
         }
     }
+
+    // public void setColumns(String columns) {
+    //     String temp = columns.replaceAll("\\[|\\]", "");
+    //     if (this.columns == null) {
+    //         this.columns = temp;
+    //     } else if (!this.columns.equals(temp)){
+    //         this.datos = null;
+    //         this.columns = temp;
+    //     }
+    // }
 }
